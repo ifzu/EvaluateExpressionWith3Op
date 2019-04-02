@@ -1,0 +1,468 @@
+ 
+#include <hidef.h>      /* common defines and macros */
+#include "mc9s12dg256.h"      /* derivative-specific definitions */
+#include <string.h>
+  
+#define LCD_DATA PORTK
+#define LCD_CTRL PORTK
+#define RS 0x01
+#define EN 0x02
+
+#define MAX 100
+
+void COMWRT4(unsigned char);
+void DATWRT4(unsigned char);
+void MSDelay(unsigned int);
+void afisString(char* p);
+
+char* p;
+
+char expr[MAX];
+
+int contor;
+
+void main(void) 
+{
+        char* p=expr;
+        DDRK = 0xFF; 
+       
+          
+        DDRA = 0x0F; //testam liniile(butoanele) 4,5,6,7 ->inputs
+        
+      //  PORTA=PORTA|0x01;  //pentru testare buton 1 setam PA0  pe 1 si PA1-PA3-0
+                          
+        
+        COMWRT4(0x33);   //reset sequence provided by data sheet
+        MSDelay(1);
+        COMWRT4(0x32);   //reset sequence provided by data sheet
+        MSDelay(1);
+        COMWRT4(0x28);   //Function set to four bit data length
+                                         //2 line, 5 x 7 dot format
+        MSDelay(1);
+        COMWRT4(0x06);  //entry mode set, increment, no shift
+        MSDelay(1);
+        COMWRT4(0x0E);  //Display set, disp on, cursor on, blink off
+        MSDelay(1);
+        COMWRT4(0x01);  //Clear display
+        MSDelay(1);
+        COMWRT4(0x80);  //set start posistion, home position
+		MSDelay(1);
+ /*     DATWRT4('H');
+        MSDelay(1);
+        DATWRT4('E');
+        MSDelay(1);
+        DATWRT4('L');
+        MSDelay(1);
+        DATWRT4('L');
+        MSDelay(1);
+        DATWRT4('O');
+        MSDelay(1);
+  
+        DATWRT4('V');   */
+       
+        
+      
+        
+        
+        for(;;){
+          
+          /* COLOANA 4 */
+          PORTA=PORTA|0x08;
+          
+          if( (PORTA & (1<<4) & (1<<3))!=0) {
+          
+          while( (PORTA & (1<<4))!=0);
+          // afisString("+");
+           strcat(p,"+");
+             //MSDelay(1);
+          
+          }
+          
+          if( (PORTA & (1<<5) & (1<<3))!=0) {
+          
+          while( (PORTA & (1<<5))!=0);
+            //afisString("-");
+             strcat(p,"-");
+           //      MSDelay(1);
+          
+          }
+          
+          if( (PORTA & (1<<6) & (1<<3))!=0) {
+          
+          while( (PORTA & (1<<6))!=0);
+            //afisString("*");
+            strcat(p,"*");
+             //SDelay(1);
+          
+          }
+          
+          if( (PORTA & (1<<7) & (1<<3))!=0) {
+          
+          while( (PORTA & (1<<7))!=0);
+          // afisString("/");
+           strcat(p,"/");
+           //Delay(1);
+           
+          
+          }
+          
+          PORTA=0;
+          
+          
+            /* COLOANA 3 */
+          PORTA=PORTA|0x04;
+          
+          if( (PORTA & (1<<4))!=0 & (1<<2)) {
+          
+          while( (PORTA & (1<<4))!=0);
+           // afisString("3");
+           strcat(p,"3");
+           //MSDelay(1);
+          
+          
+          }
+          
+          if( (PORTA & (1<<5) & (1<<2))!=0) {
+          
+          while( (PORTA & (1<<5))!=0);
+           // afisString("6");
+           strcat(p,"6");
+           //MSDelay(1);
+           
+          
+          }
+          
+          if( (PORTA & (1<<6)& (1<<2))!=0) {
+          
+          while( (PORTA & (1<<6))!=0);
+            //afisString("9");
+           strcat(p,"9");
+           //MSDelay(1);
+          
+          
+          }
+          
+          if( (PORTA & (1<<7)& (1<<2))!=0) {
+          
+          while( (PORTA & (1<<7))!=0);
+           // afisString("=");
+           //MSDelay(1);
+          
+            afisString(p);
+          }
+          
+          PORTA=0;
+          
+          
+           
+          /* COLOANA 2 */
+          PORTA=PORTA|0x02;
+          
+          if( (PORTA & (1<<4)&(1<<1))!=0) {
+          
+          while( (PORTA & (1<<4))!=0);
+            //afisString("2");
+            strcat(p,"2");
+            //MSDelay(1);
+           
+          
+          }
+          
+          if( (PORTA & (1<<5)&(1<<1))!=0) {
+          
+          while( (PORTA & (1<<5))!=0);
+          //afisString("5");
+          strcat(p,"5");
+          //MSDelay(1);
+         
+          
+          }
+          
+          if( (PORTA & (1<<6)&(1<<1))!=0) {
+          
+          while( (PORTA & (1<<6))!=0);
+          //afisString("8");
+          strcat(p,"8");
+          // MSDelay(1);
+          
+          
+          }
+          
+          if( (PORTA & (1<<7)&(1<<1))!=0) {
+          
+          while( (PORTA & (1<<7))!=0);
+            //afisString("0");
+           strcat(p,"0");
+           //MSDelay(1);
+          
+          
+          }
+          
+          //PORTA&=0xF0;
+            PORTA=0;
+          
+         
+          
+        
+          /* COLOANA 1 */ 
+                  
+          //while(PORTA&0xF0==0xF0);
+          
+          
+          PORTA=PORTA|0x01;
+         
+          //testare buton 
+          if( (PORTA & (1<<4) & 1)!=0) {
+          
+          while( (PORTA & (1<<4) )!=0);
+            //afisString("1");
+            strcat(p,"1");
+            //MSDelay(1);
+          }
+          
+          if( (PORTA & (1<<5) &1)!=0) {
+          
+          while( (PORTA & (1<<5) )!=0);
+            //afisString("4");
+             strcat(p,"4");
+            // MSDelay(1);
+          
+          }
+          
+          if( (PORTA & (1<<6) &1)!=0) {
+          
+          while( (PORTA & (1<<6) )!=0);
+            //afisString("7");
+          strcat(p,"7");
+          // MSDelay(1);
+      
+          }
+          
+          if( (PORTA & (1<<7)&1)!=0) {
+          
+          while( (PORTA & (1<<7) )!=0);
+            //afisString("*");
+          
+          strcat(p,"z");
+          //MSDelay(1);
+          
+          }
+          
+          PORTA=0;
+                    
+        }
+  
+
+
+
+	
+}
+
+
+
+void COMWRT4(unsigned char command)
+  {
+        unsigned char x;
+        
+        x = (command & 0xF0) >> 2;         //shift high nibble to center of byte for Pk5-Pk2
+      LCD_DATA =LCD_DATA & ~0x3C;          //clear bits Pk5-Pk2
+        LCD_DATA = LCD_DATA | x;          //sends high nibble to PORTK
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL & ~RS;         //set RS to command (RS=0)
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL | EN;          //rais enable
+        MSDelay(5);
+        LCD_CTRL = LCD_CTRL & ~EN;         //Drop enable to capture command
+        MSDelay(15);                       //wait
+        x = (command & 0x0F)<< 2;          // shift low nibble to center of byte for Pk5-Pk2
+        LCD_DATA =LCD_DATA & ~0x3C;         //clear bits Pk5-Pk2
+        LCD_DATA =LCD_DATA | x;             //send low nibble to PORTK
+        LCD_CTRL = LCD_CTRL | EN;          //rais enable
+        MSDelay(5);
+        LCD_CTRL = LCD_CTRL & ~EN;         //drop enable to capture command
+        MSDelay(15);
+  }
+
+         void DATWRT4(unsigned char data)
+  {
+  unsigned char x;
+       
+        
+        
+        x = (data & 0xF0) >> 2;
+        LCD_DATA =LCD_DATA & ~0x3C;                     
+        LCD_DATA = LCD_DATA | x;
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL | RS;
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL | EN;
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL & ~EN;
+        MSDelay(5);
+                     
+        x = (data & 0x0F)<< 2;
+        LCD_DATA =LCD_DATA & ~0x3C;                     
+        LCD_DATA = LCD_DATA | x;
+        LCD_CTRL = LCD_CTRL | EN;
+        MSDelay(1);
+        LCD_CTRL = LCD_CTRL & ~EN;
+        MSDelay(15);
+  }
+  
+  
+  
+  void afisString(char* string){
+    
+    while(*string!='\0'){
+      DATWRT4(*string);
+      MSDelay(1);
+      string++;
+    }
+    
+    
+  }
+  
+
+
+ void MSDelay(unsigned int itime)
+  {
+    unsigned int i; unsigned int j;
+    for(i=0;i<itime;i++)
+      for(j=0;j<4000;j++);
+ }
+ 
+ 
+ void evaluateExpr(char* expr){
+	
+	//expr
+	char finalexpr[16];
+
+	//maxim 3 operanzi
+	char operatori[2] = {0};
+	float operanzi[3];
+	unsigned k = 0;
+	unsigned nrop = 0;
+	float rez = 0;
+	float aux = 0;
+	char* expresie = expr;
+	char* p;
+	int i;
+	
+
+	while (*expresie != '\0'){
+
+		if (!isdigit(*expresie))
+			operatori[nrop++] = *expresie;
+		++expresie;
+	}
+
+
+	p = strtok(expr, "/+-*");
+	
+	while (p!=NULL){
+		
+		operanzi[k]= strtod(p,NULL);
+		printf("%.3f\n", operanzi[k]);
+		k++;
+		p = strtok(NULL, "/+-*");
+
+	}
+	
+
+	//daca avem un operator
+	//avem 2 operanzi 
+	if (nrop == 1){
+
+		switch (operatori[0]){
+		case '+':
+			rez = operanzi[0] + operanzi[1];
+			break;
+
+		case '-':
+			rez = operanzi[0] - operanzi[1];
+			break;
+
+		case '*':
+			rez = operanzi[0] * operanzi[1];
+			break;
+
+		case '/':
+			rez = operanzi[0] / operanzi[1];
+			break;
+
+		default:
+			break;
+			
+		}
+
+	//2 operatori => 3 operanzi 
+	}else if ((operatori[1] == '*' || operatori[1] == '/' )&& (operatori[0] == '+' || operatori[0] == '-')){  //tratam cazul exceptional
+
+		switch (operatori[1]){
+		case '*':
+			aux = operanzi[1] * operanzi[2];
+			break;
+		case '/':
+			aux = operanzi[1] / operanzi[2];
+			break;
+
+		}
+
+		switch (operatori[0]){
+		case '+':
+			rez = aux + operanzi[0];
+			break;
+		case '-':
+			rez = aux - operanzi[0];
+			break;
+
+		}
+
+		printf("%.3f", rez);
+
+	}
+	else{
+		switch (operatori[0]){
+		case '*':
+			aux = operanzi[0] * operanzi[1];
+			break;
+		case '/':
+			aux = operanzi[0] / operanzi[1];
+			break;
+		case '+':
+			aux = operanzi[0] + operanzi[1];
+			break;
+		case '-':
+			aux = operanzi[0] - operanzi[1];
+			break;
+
+		}
+
+		switch (operatori[1]){
+		case '+':
+			rez = aux + operanzi[2];
+			break;
+		case '-':
+			rez = aux - operanzi[2];
+			break;
+		case '*':
+			rez = aux * operanzi[2];
+			break;
+		case '/':
+			rez = aux / operanzi[2];
+			break;
+
+		}
+		
+
+	}
+
+
+	//printf("%.3f", rez);
+	sprintf(finalexpr, "%.2f", rez);
+	printf("%s", finalexpr);
+}
+
+ 
+ 
+ 
